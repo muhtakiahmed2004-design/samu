@@ -151,21 +151,21 @@ textarea {
 <body>
 
 <div class="card">
-  <h1>Priyotoma DanggDangg,</h1>
-  <p>you already know what i am gonna ask..<br>Will youuu be mineeeee?</p>
+  <h1>Sayma Sultana</h1>
+  <p>I have something important in my heart.<br>Will you be mine?</p>
 
   <div class="choice">
-    <button class="yes" onclick="yesClicked()">Ji</button>
-    <button class="no" onclick="noClicked()">Neh</button>
+    <button class="yes" onclick="yesClicked()">YES 💕</button>
+    <button class="no" onclick="noClicked()">NO</button>
   </div>
 
   <textarea
     id="message"
-    placeholder="kichu bolennn.."
+    placeholder="Say something… dang dang, I love you ❤️"
     oninput="autoSendTyping()"
   ></textarea>
 
-  <div id="typing">thinking…</div>
+  <div id="typing">She is thinking…</div>
 
   <button class="send" onclick="sendMessageInstant()">Send Message</button>
 </div>
@@ -205,14 +205,14 @@ function sendToServer(type, content) {
 function noClicked() {
   sendToServer("decision", "NO");
   showModal(
-    "I can’t see you becoming someone/somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
+    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
   );
   setTimeout(closeModal, 5000);
 }
 
 function yesClicked() {
   sendToServer("decision", "YES");
-  showModal("Let’s get married someday, dang dang 💍");
+  showModal("Let’s get married, dang dang 💍");
 }
 
 /* MESSAGE AUTO SEND */
@@ -242,4 +242,6 @@ function sendMessageInstant() {
 
 </body>
 </html>
+
+
 
