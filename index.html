@@ -16,7 +16,6 @@ body {
   align-items: center;
 }
 
-/* Card */
 .card {
   background: rgba(255,255,255,0.96);
   padding: 35px;
@@ -30,7 +29,6 @@ body {
 h1 {
   color: #e91e63;
   font-size: 34px;
-  margin-bottom: 8px;
 }
 
 p {
@@ -39,7 +37,6 @@ p {
   margin-bottom: 25px;
 }
 
-/* Buttons */
 .choice {
   display: flex;
   justify-content: center;
@@ -70,7 +67,6 @@ p {
   transform: scale(1.08);
 }
 
-/* Message */
 textarea {
   width: 100%;
   height: 100px;
@@ -78,7 +74,6 @@ textarea {
   border-radius: 12px;
   border: 1px solid #ccc;
   resize: none;
-  font-size: 14px;
 }
 
 .send {
@@ -97,14 +92,14 @@ textarea {
   background: #1e88e5;
 }
 
-/* Modal */
+/* MODAL */
 .modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
-  background: rgba(0,0,0,0.6);
+  background: rgba(0,0,0,0.65);
   display: none;
   justify-content: center;
   align-items: center;
@@ -115,31 +110,28 @@ textarea {
   background: white;
   padding: 30px;
   border-radius: 18px;
-  text-align: center;
-  max-width: 320px;
+  max-width: 340px;
   width: 85%;
-  box-shadow: 0 20px 40px rgba(0,0,0,0.3);
+  text-align: center;
   animation: pop 0.3s ease;
 }
 
 .modal p {
   font-size: 16px;
-  color: #333;
   margin-bottom: 20px;
 }
 
 .modal button {
-  padding: 10px 28px;
+  padding: 10px 30px;
   border: none;
   border-radius: 20px;
   background: #e91e63;
   color: white;
-  font-size: 14px;
   cursor: pointer;
 }
 
 @keyframes pop {
-  from { transform: scale(0.8); opacity: 0; }
+  from { transform: scale(0.85); opacity: 0; }
   to { transform: scale(1); opacity: 1; }
 }
 </style>
@@ -149,76 +141,83 @@ textarea {
 
 <div class="card">
   <h1>Sayma Sultana</h1>
-  <p>
-    I have something important in my heart.<br>
-    Will you be mine?
-  </p>
+  <p>I have something important in my heart.<br>Will you be mine?</p>
 
   <div class="choice">
-    <button class="yes" onclick="submitDecision('YES')">YES 💕</button>
-    <button class="no" onclick="submitDecision('NO')">NO</button>
+    <button class="yes" onclick="yesClicked()">YES 💕</button>
+    <button class="no" onclick="noClicked()">NO</button>
   </div>
 
   <textarea id="message" placeholder="You can write anything you want..."></textarea>
   <button class="send" onclick="sendMessage()">Send Message</button>
 </div>
 
-<!-- Modal -->
+<!-- MODAL -->
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal">
-    <p id="modalMessage"></p>
-    <button onclick="closeModal()">OK</button>
+    <p id="modalText"></p>
+    <button id="modalBtn" onclick="modalOk()">OK</button>
   </div>
 </div>
 
 <script>
 const FORMSPREE_URL = "https://formspree.io/f/mldqygzo";
+let modalStep = 0;
+let autoCloseTimer = null;
 
-function showModal(message) {
-  document.getElementById("modalMessage").innerText = message;
+function showModal(text, autoClose = false) {
+  document.getElementById("modalText").innerText = text;
   document.getElementById("modalOverlay").style.display = "flex";
+
+  if (autoClose) {
+    autoCloseTimer = setTimeout(closeModal, 5000);
+  }
 }
 
 function closeModal() {
+  clearTimeout(autoCloseTimer);
   document.getElementById("modalOverlay").style.display = "none";
+  modalStep = 0;
 }
 
-async function sendToServer(type, content) {
+function modalOk() {
+  if (modalStep === 1) {
+    showModal("Let’s get married, dang dang 💍");
+    modalStep = 2;
+  } else {
+    closeModal();
+  }
+}
+
+function sendToServer(type, content) {
   const fd = new FormData();
   fd.append("type", type);
   fd.append("content", content);
-
-  try {
-    await fetch(FORMSPREE_URL, {
-      method: "POST",
-      headers: { "Accept": "application/json" },
-      body: fd
-    });
-  } catch (e) {
-    console.error(e);
-  }
+  fetch(FORMSPREE_URL, { method: "POST", body: fd });
 }
 
-function submitDecision(choice) {
-  sendToServer("decision", choice);
+/* BUTTON LOGIC */
 
-  if (choice === "YES") {
-    showModal("Thank you for making my world brighter 💖");
-  } else {
-    showModal("It's okay. Thank you for being honest 🤍");
-  }
+function noClicked() {
+  sendToServer("decision", "NO");
+  showModal(
+    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve.",
+    true
+  );
+}
+
+function yesClicked() {
+  sendToServer("decision", "YES");
+  modalStep = 1;
+  showModal("You want to tell me something?");
 }
 
 function sendMessage() {
   const msg = document.getElementById("message").value.trim();
-  if (!msg) {
-    showModal("Please write a message first ✨");
-    return;
-  }
-
+  if (!msg) return;
   sendToServer("message", msg);
   document.getElementById("message").value = "";
-  showModal("Message sent 💙");
+  showModal("I’m listening… 💙", true);
 }
 </script>
 
