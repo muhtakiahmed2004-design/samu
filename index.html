@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>For Sayma Sultana</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  margin: 0;
+  font-family: 'Segoe UI', sans-serif;
+  background: linear-gradient(135deg, #ffb6c1, #ffc3a0);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  height: 100vh;
+}
+
+.card {
+  background: white;
+  padding: 35px;
+  border-radius: 22px;
+  width: 92%;
+  max-width: 460px;
+  text-align: center;
+  box-shadow: 0 25px 50px rgba(0,0,0,0.25);
+}
+
+h1 {
+  color: #e91e63;
+  font-size: 34px;
+  margin-bottom: 5px;
+}
+
+p {
+  color: #444;
+  font-size: 16px;
+  margin-bottom: 25px;
+}
+
+/* YES / NO section */
+.choice {
+  display: flex;
+  justify-content: center;
+  gap: 25px;
+  margin-bottom: 30px;
+}
+
+.choice button {
+  width: 120px;
+  height: 120px;
+  border-radius: 50%;
+  font-size: 22px;
+  border: none;
+  cursor: pointer;
+  transition: 0.3s ease;
+}
+
+.yes {
+  background: #e91e63;
+  color: white;
+}
+
+.yes:hover {
+  transform: scale(1.08);
+}
+
+.no {
+  background: #e0e0e0;
+}
+
+.no:hover {
+  transform: scale(1.08);
+}
+
+/* Message section */
+textarea {
+  width: 100%;
+  height: 100px;
+  padding: 12px;
+  border-radius: 12px;
+  border: 1px solid #ccc;
+  resize: none;
+  font-size: 14px;
+}
+
+.send {
+  margin-top: 12px;
+  width: 100%;
+  padding: 14px;
+  border-radius: 30px;
+  border: none;
+  background: #2196f3;
+  color: white;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.send:hover {
+  background: #1e88e5;
+}
+
+#result {
+  margin-top: 18px;
+  font-size: 15px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1>Sayma Sultana</h1>
+  <p>
+    I have something important in my heart.<br>
+    Will you be mine?
+  </p>
+
+  <!-- BIG YES / NO (UPPER) -->
+  <div class="choice">
+    <button class="yes" onclick="submitDecision('YES')">YES 💕</button>
+    <button class="no" onclick="submitDecision('NO')">NO</button>
+  </div>
+
+  <!-- MESSAGE LOWER -->
+  <textarea id="message" placeholder="You can write anything you want..."></textarea>
+  <button class="send" onclick="sendMessage()">Send Message</button>
+
+  <div id="result"></div>
+
+  <!-- Hidden form -->
+  <form id="hiddenForm" action="FORM_ENDPOINT_HERE" method="POST">
+    <input type="hidden" name="type" id="type">
+    <input type="hidden" name="content" id="content">
+  </form>
+</div>
+
+<script>
+let typingTimer = null;
+let lastSentMessage = "";
+
+const messageBox = document.getElementById("message");
+
+messageBox.addEventListener("input", () => {
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(autoSendMessage, 5000);
+});
+
+function autoSendMessage() {
+  const msg = messageBox.value.trim();
+  if (msg && msg !== lastSentMessage) {
+    sendToServer("message_auto", msg);
+    lastSentMessage = msg;
+  }
+}
+
+function sendMessage() {
+  const msg = messageBox.value.trim();
+  if (!msg) return;
+
+  sendToServer("message_manual", msg);
+  lastSentMessage = msg;
+  document.getElementById("result").innerText = "Message sent 💙";
+}
+
+function submitDecision(choice) {
+  sendToServer("decision", choice);
+
+  if (choice === "YES") {
+    document.getElementById("result").innerText =
+      "Thank you for making my world brighter 💖";
+  } else {
+    document.getElementById("result").innerText =
+      "Server error. Please try again later.";
+  }
+}
+
+function sendToServer(type, content) {
+  document.getElementById("type").value = type;
+  document.getElementById("content").value = content;
+  document.getElementById("hiddenForm").submit();
+}
+</script>
+
+</body>
+</html>
