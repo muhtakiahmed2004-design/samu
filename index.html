@@ -10,7 +10,7 @@ body {
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   height: 100vh;
-background: url('background.jpg?v=2') center/cover no-repeat;
+  background: url('background.jpg?v=2') center/cover no-repeat;
   display: flex;
   justify-content: center;
   align-items: center;
@@ -26,10 +26,7 @@ background: url('background.jpg?v=2') center/cover no-repeat;
   box-shadow: 0 25px 50px rgba(0,0,0,0.25);
 }
 
-h1 {
-  color: #e91e63;
-  font-size: 32px;
-}
+h1 { color: #e91e63; font-size: 32px; }
 
 p {
   color: #444;
@@ -54,23 +51,11 @@ p {
   transition: 0.3s ease;
 }
 
-.yes {
-  background: #e91e63;
-  color: white;
-}
+.yes { background: #e91e63; color: white; }
+.no  { background: #e0e0e0; }
 
-.no {
-  background: #e0e0e0;
-}
-
-button:disabled {
-  opacity: 0.45;
-  cursor: not-allowed;
-}
-
-.choice button:hover:not(:disabled) {
-  transform: scale(1.08);
-}
+button:disabled { opacity: 0.45; cursor: not-allowed; }
+.choice button:hover:not(:disabled) { transform: scale(1.08); }
 
 /* MESSAGE BOX */
 textarea {
@@ -95,10 +80,7 @@ textarea {
   font-size: 15px;
   cursor: pointer;
 }
-
-.send:hover {
-  background: #1e88e5;
-}
+.send:hover { background: #1e88e5; }
 
 /* COUNTDOWN */
 #countdown {
@@ -107,19 +89,13 @@ textarea {
   color: rgba(0,0,0,0.45);
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
-
-#countdown.hidden {
-  opacity: 0;
-  visibility: hidden;
-}
+#countdown.hidden { opacity: 0; visibility: hidden; }
 
 /* MODAL */
 .modal-overlay {
   position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
+  top: 0; left: 0;
+  width: 100%; height: 100%;
   background: rgba(0,0,0,0.65);
   display: none;
   justify-content: center;
@@ -136,10 +112,7 @@ textarea {
   text-align: center;
 }
 
-.modal p {
-  font-size: 16px;
-  margin-bottom: 20px;
-}
+.modal p { font-size: 16px; margin-bottom: 20px; }
 
 .modal button {
   padding: 10px 30px;
@@ -207,7 +180,10 @@ let typingTimer = null;
 let lastSentText = "";
 let countdownTimer = null;
 let countdownValue = 15;
+
 let hasSentMessage = false;
+let yesPressed = false; // ✅ NEW: countdown only works after YES
+
 let hasEngaged = localStorage.getItem("engaged") === "true";
 
 /* SEND TO SERVER */
@@ -243,6 +219,7 @@ function showFinalView(text) {
 
 /* COUNTDOWN */
 function startCountdown() {
+  if (!yesPressed) return;        // ✅ only after YES
   if (hasSentMessage) return;
 
   clearInterval(countdownTimer);
@@ -266,7 +243,8 @@ function startCountdown() {
 
 function stopCountdown() {
   clearInterval(countdownTimer);
-  document.getElementById("countdown").classList.add("hidden");
+  const cd = document.getElementById("countdown");
+  cd.classList.add("hidden");
 }
 
 /* BUTTON LOGIC */
@@ -274,10 +252,14 @@ function yesClicked() {
   sendToServer("decision", "YES");
   localStorage.setItem("engaged", "true");
 
+  yesPressed = true; // ✅ mark YES pressed
+
   document.getElementById("yesBtn").disabled = true;
   document.getElementById("noBtn").disabled = true;
 
   showModal("Let’s get married whenever you say, dang dang 💍");
+
+  // ✅ countdown starts immediately after YES (as you wanted)
   startCountdown();
 }
 
@@ -291,11 +273,15 @@ function noClicked() {
 
 /* MESSAGE HANDLING */
 function autoSendTyping() {
+  // ✅ Before YES, do nothing with countdown
+  if (!yesPressed) return;
+
   const text = message.value.trim();
 
   if (text.length > 0) {
-    stopCountdown();
+    stopCountdown(); // typing stops countdown
   } else {
+    // ✅ after YES, empty box restarts countdown from 15
     startCountdown();
     return;
   }
@@ -323,6 +309,7 @@ function sendMessageInstant() {
 
 /* RESTORE STATE */
 if (hasEngaged) {
+  yesPressed = true; // ✅ if engaged already, treat as YES already happened
   showFinalView("Inshallah soon");
 }
 
@@ -335,7 +322,7 @@ window.addEventListener("resize", () => {
 
   if (currentHeight < initialViewportHeight - 120) {
     cd.classList.add("hidden");
-  } else if (countdownTimer && !hasSentMessage) {
+  } else if (countdownTimer && !hasSentMessage && yesPressed) {
     cd.classList.remove("hidden");
   }
 });
