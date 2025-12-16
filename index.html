@@ -164,8 +164,25 @@ textarea {
   </p>
 
   <div class="choice">
-    <button id="yesBtn" class="yes" onclick="yesClicked()">Yes</button>
-    <button id="noBtn" class="no" onclick="noClicked()">No</button>
+    <button
+      id="yesBtn"
+      class="yes"
+      onclick="yesClicked()"
+      onmouseenter="this.innerText='Ji'"
+      onmouseleave="this.innerText='Yes'"
+    >
+      Yes
+    </button>
+
+    <button
+      id="noBtn"
+      class="no"
+      onclick="noClicked()"
+      onmouseenter="this.innerText='Neh'"
+      onmouseleave="this.innerText='No'"
+    >
+      No
+    </button>
   </div>
 
   <textarea
@@ -346,12 +363,4 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
-
-
-
-
-
-
-
-
 
