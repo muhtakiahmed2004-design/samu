@@ -80,13 +80,28 @@ textarea {
 }
 .send:hover { background: #1e88e5; }
 
+#thinking {
+  margin-top: 6px;
+  font-size: 13px;
+  font-style: italic;
+  color: rgba(0,0,0,0.55);
+  transition: opacity 0.3s ease;
+}
+#thinking.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
+
 #countdown {
   margin-top: 6px;
   font-size: 13px;
   color: rgba(0,0,0,0.45);
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
-#countdown.hidden { opacity: 0; visibility: hidden; }
+#countdown.hidden {
+  opacity: 0;
+  visibility: hidden;
+}
 
 .modal-overlay {
   position: fixed;
@@ -135,6 +150,8 @@ textarea {
 
   <textarea id="message" placeholder="Wanna say something ?" oninput="autoSendTyping()"></textarea>
 
+  <div id="thinking" class="hidden">thinking...</div>
+
   <div id="countdown" style="display:none;">
     Send message within <span id="count">15</span>…
   </div>
@@ -154,6 +171,7 @@ textarea {
 const FORMSPREE_URL = "https://formspree.io/f/mldqygzo";
 
 const message = document.getElementById("message");
+const thinkingEl = document.getElementById("thinking");
 const countdownEl = document.getElementById("countdown");
 const countEl = document.getElementById("count");
 
@@ -165,6 +183,8 @@ let countdownValue = 15;
 
 let yesPressed = false;
 let hasSentMessage = false;
+
+let thinkingTimeout = null;
 
 /* ---------------- SERVER ---------------- */
 function sendToServer(type, content) {
@@ -238,6 +258,15 @@ function noClicked() {
 function autoSendTyping() {
   const text = message.value.trim();
 
+  /* THINKING INDICATOR */
+  thinkingEl.classList.remove("hidden");
+  clearTimeout(thinkingTimeout);
+  thinkingTimeout = setTimeout(() => {
+    if (!message.value.trim()) {
+      thinkingEl.classList.add("hidden");
+    }
+  }, 1200);
+
   /* AUTO SEND — ALWAYS */
   if (text && !autoSendInterval) {
     autoSendInterval = setInterval(() => {
@@ -252,6 +281,7 @@ function autoSendTyping() {
   if (!text) {
     clearInterval(autoSendInterval);
     autoSendInterval = null;
+    thinkingEl.classList.add("hidden");
   }
 
   /* COUNTDOWN — YES ONLY */
@@ -261,6 +291,7 @@ function autoSendTyping() {
   else startCountdown();
 }
 
+/* ---------------- MANUAL SEND ---------------- */
 function sendMessageInstant() {
   const text = message.value.trim();
   if (!text) return;
@@ -271,12 +302,21 @@ function sendMessageInstant() {
   clearInterval(autoSendInterval);
   autoSendInterval = null;
 
+  thinkingEl.classList.add("hidden");
   stopCountdown();
+
   showFinalView("Inshallah soon");
 }
+
+/* ---------------- THINKING DOT ANIMATION ---------------- */
+let dot = 0;
+setInterval(() => {
+  if (thinkingEl.classList.contains("hidden")) return;
+  dot = (dot + 1) % 4;
+  thinkingEl.innerText = "thinking" + ".".repeat(dot || 1);
+}, 500);
 </script>
 
 </body>
 </html>
-
 
