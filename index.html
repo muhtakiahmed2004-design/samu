@@ -142,6 +142,206 @@ textarea {
 }
 
 .modal button {
-  paddi
+  padding: 10px 30px;
+  border: none;
+  border-radius: 20px;
+  background: #e91e63;
+  color: white;
+  cursor: pointer;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+  <h1 id="mainTitle">Dear DanggDangg,</h1>
+  <p id="mainText">
+    No hurries, there’s a whole lifetime left to reply.<br>
+    Will you be mine?
+  </p>
+
+  <div class="choice">
+    <button
+      id="yesBtn"
+      class="yes"
+      onclick="yesClicked()"
+      onmouseenter="this.innerText='Ji'"
+      onmouseleave="this.innerText='Yes'"
+    >Yes</button>
+
+    <button
+      id="noBtn"
+      class="no"
+      onclick="noClicked()"
+      onmouseenter="this.innerText='Neh'"
+      onmouseleave="this.innerText='No'"
+    >No</button>
+  </div>
+
+  <textarea
+    id="message"
+    placeholder="Wanna say something ?"
+    oninput="autoSendTyping()"
+  ></textarea>
+
+  <div id="countdown" style="display:none;">
+    Send message within <span id="count">15</span>…
+  </div>
+
+  <button class="send" onclick="sendMessageInstant()">Send Message</button>
+</div>
+
+<!-- MODAL -->
+<div id="modalOverlay" class="modal-overlay">
+  <div class="modal">
+    <p id="modalText"></p>
+    <button onclick="closeModal()">OK</button>
+  </div>
+</div>
+
+<script>
+const FORMSPREE_URL = "https://formspree.io/f/mldqygzo";
+
+let typingTimer = null;
+let lastSentText = "";
+let countdownTimer = null;
+let countdownValue = 15;
+let hasSentMessage = false;
+let hasEngaged = localStorage.getItem("engaged") === "true";
+
+/* SEND TO SERVER */
+function sendToServer(type, content) {
+  const fd = new FormData();
+  fd.append("type", type);
+  fd.append("content", content);
+  fetch(FORMSPREE_URL, { method: "POST", body: fd });
+}
+
+/* MODAL */
+function showModal(text) {
+  document.getElementById("modalText").innerText = text;
+  document.getElementById("modalOverlay").style.display = "flex";
+}
+function closeModal() {
+  document.getElementById("modalOverlay").style.display = "none";
+}
+
+/* FINAL VIEW */
+function showFinalView(text) {
+  document.getElementById("mainTitle").innerText = "Talvi weds Sayma";
+  document.getElementById("mainText").innerText = text;
+
+  const choice = document.querySelector(".choice");
+  if (choice) choice.remove();
+
+  const msgBox = document.getElementById("message");
+  msgBox.placeholder = "Say Say..";
+  msgBox.value = "";
+  msgBox.dataset.final = "true";
+}
+
+/* COUNTDOWN */
+function startCountdown() {
+  if (hasSentMessage) return;
+
+  clearInterval(countdownTimer);
+  countdownValue = 15;
+  document.getElementById("count").innerText = countdownValue;
+
+  const cd = document.getElementById("countdown");
+  cd.style.display = "block";
+  cd.classList.remove("hidden");
+
+  countdownTimer = setInterval(() => {
+    countdownValue--;
+    document.getElementById("count").innerText = countdownValue;
+
+    if (countdownValue <= 0) {
+      clearInterval(countdownTimer);
+      showFinalView("Inshallah");
+    }
+  }, 1000);
+}
+
+function stopCountdown() {
+  clearInterval(countdownTimer);
+  document.getElementById("countdown").classList.add("hidden");
+}
+
+/* BUTTON LOGIC */
+function yesClicked() {
+  sendToServer("decision", "YES");
+  localStorage.setItem("engaged", "true");
+
+  document.getElementById("yesBtn").disabled = true;
+  document.getElementById("noBtn").disabled = true;
+
+  showModal("Let’s get married whenever you say, dang dang 💍");
+  startCountdown();
+}
+
+function noClicked() {
+  sendToServer("decision", "NO");
+  showModal(
+    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
+  );
+  setTimeout(closeModal, 5000);
+}
+
+/* MESSAGE HANDLING */
+function autoSendTyping() {
+  const text = message.value.trim();
+
+  if (text.length > 0) {
+    stopCountdown();
+  } else {
+    startCountdown();
+    return;
+  }
+
+  clearTimeout(typingTimer);
+  typingTimer = setTimeout(() => {
+    if (text !== lastSentText) {
+      sendToServer("auto_message", text);
+      lastSentText = text;
+    }
+  }, 3000);
+}
+
+function sendMessageInstant() {
+  const text = message.value.trim();
+  if (!text) return;
+
+  sendToServer("manual_message", text);
+  lastSentText = text;
+  hasSentMessage = true;
+
+  stopCountdown();
+  showFinalView("Inshallah soon");
+}
+
+/* RESTORE STATE */
+if (hasEngaged) {
+  showFinalView("Inshallah soon");
+}
+
+/* MOBILE KEYBOARD FADE */
+let initialViewportHeight = window.innerHeight;
+window.addEventListener("resize", () => {
+  const currentHeight = window.innerHeight;
+  const cd = document.getElementById("countdown");
+  if (!cd) return;
+
+  if (currentHeight < initialViewportHeight - 120) {
+    cd.classList.add("hidden");
+  } else if (countdownTimer && !hasSentMessage) {
+    cd.classList.remove("hidden");
+  }
+});
+</script>
+
+</body>
+</html>
 
 
