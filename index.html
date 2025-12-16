@@ -34,14 +34,14 @@ h1 {
 p {
   color: #444;
   font-size: 16px;
-  margin-bottom: 25px;
+  margin-bottom: 22px;
 }
 
 .choice {
   display: flex;
   justify-content: center;
   gap: 25px;
-  margin-bottom: 22px;
+  margin-bottom: 20px;
 }
 
 .choice button {
@@ -67,7 +67,7 @@ p {
   transform: scale(1.08);
 }
 
-/* SMALL MESSAGE BOX */
+/* MESSAGE BOX */
 textarea {
   width: 100%;
   height: 60px;
@@ -76,6 +76,14 @@ textarea {
   border: 1px solid #ccc;
   resize: none;
   font-size: 14px;
+}
+
+/* TYPING INDICATOR */
+#typing {
+  font-size: 13px;
+  color: #888;
+  margin-top: 6px;
+  display: none;
 }
 
 /* SEND BUTTON */
@@ -153,9 +161,11 @@ textarea {
 
   <textarea
     id="message"
-    placeholder="Wanna say something?"
+    placeholder="Say something… dang dang, I love you ❤️"
     oninput="autoSendTyping()"
   ></textarea>
+
+  <div id="typing">She is thinking…</div>
 
   <button class="send" onclick="sendMessageInstant()">Send Message</button>
 </div>
@@ -164,7 +174,7 @@ textarea {
 <div id="modalOverlay" class="modal-overlay">
   <div class="modal">
     <p id="modalText"></p>
-    <button onclick="modalOk()">OK</button>
+    <button onclick="closeModal()">OK</button>
   </div>
 </div>
 
@@ -172,30 +182,18 @@ textarea {
 const FORMSPREE_URL = "https://formspree.io/f/mldqygzo";
 let typingTimer = null;
 let lastSentText = "";
-let modalStep = 0;
 
-/* MODAL FUNCTIONS */
-function showModal(text, autoClose = false) {
+/* MODAL */
+function showModal(text) {
   document.getElementById("modalText").innerText = text;
   document.getElementById("modalOverlay").style.display = "flex";
-  if (autoClose) setTimeout(closeModal, 5000);
 }
 
 function closeModal() {
   document.getElementById("modalOverlay").style.display = "none";
-  modalStep = 0;
 }
 
-function modalOk() {
-  if (modalStep === 1) {
-    showModal("Let’s get married, dang dang 💍");
-    modalStep = 2;
-  } else {
-    closeModal();
-  }
-}
-
-/* SEND TO FORMSPREE */
+/* SEND TO SERVER */
 function sendToServer(type, content) {
   const fd = new FormData();
   fd.append("type", type);
@@ -207,25 +205,27 @@ function sendToServer(type, content) {
 function noClicked() {
   sendToServer("decision", "NO");
   showModal(
-    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve.",
-    true
+    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
   );
+  setTimeout(closeModal, 5000);
 }
 
 function yesClicked() {
   sendToServer("decision", "YES");
-  modalStep = 1;
-  showModal("You want to tell me something?");
+  showModal("Let’s get married, dang dang 💍");
 }
 
-/* MESSAGE AUTO-SEND */
+/* MESSAGE AUTO SEND */
 function autoSendTyping() {
+  document.getElementById("typing").style.display = "block";
   clearTimeout(typingTimer);
+
   typingTimer = setTimeout(() => {
     const text = message.value.trim();
     if (text && text !== lastSentText) {
       sendToServer("auto_message", text);
       lastSentText = text;
+      document.getElementById("typing").style.display = "none";
     }
   }, 3000);
 }
@@ -236,10 +236,9 @@ function sendMessageInstant() {
   if (!text) return;
   sendToServer("manual_message", text);
   lastSentText = text;
-  showModal("I’m listening… 💙", true);
+  document.getElementById("typing").style.display = "none";
 }
 </script>
 
 </body>
 </html>
-
