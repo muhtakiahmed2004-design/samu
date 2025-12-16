@@ -273,7 +273,7 @@ function yesClicked() {
 function noClicked() {
   sendToServer("decision", "NO");
   showModal(
-    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
+    "I can’t see you becoming/somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
   );
   setTimeout(closeModal, 5000);
 }
@@ -334,6 +334,7 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
+
 
 
 
