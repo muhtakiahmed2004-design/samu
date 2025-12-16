@@ -151,21 +151,21 @@ textarea {
 <body>
 
 <div class="card">
-  <h1>Sayma Sultana</h1>
-  <p>I have something important in my heart.<br>Will you be mine?</p>
+  <h1>Dear DanggDangg,</h1>
+  <p>you pretty girl.No hurries there's whole lifetime left to reply.<br>Will you bee mine?</p>
 
   <div class="choice">
-    <button class="yes" onclick="yesClicked()">YES 💕</button>
-    <button class="no" onclick="noClicked()">NO</button>
+    <button class="yes" onclick="yesClicked()">Ji 💕</button>
+    <button class="no" onclick="noClicked()">Neh</button>
   </div>
 
   <textarea
     id="message"
-    placeholder="Say something… dang dang, I love you ❤️"
+    placeholder="Wanna say something ?"
     oninput="autoSendTyping()"
   ></textarea>
 
-  <div id="typing">She is thinking…</div>
+  <div id="typing">She's thinking…</div>
 
   <button class="send" onclick="sendMessageInstant()">Send Message</button>
 </div>
@@ -212,7 +212,7 @@ function noClicked() {
 
 function yesClicked() {
   sendToServer("decision", "YES");
-  showModal("Let’s get married, dang dang 💍");
+  showModal("Let’s get married whenever yu say, dang dang 💍");
 }
 
 /* MESSAGE AUTO SEND */
@@ -242,6 +242,7 @@ function sendMessageInstant() {
 
 </body>
 </html>
+
 
 
 
