@@ -239,9 +239,14 @@ function startCountdown() {
   countdownTimer = setInterval(() => {
     countdownValue--;
     document.getElementById("count").innerText = countdownValue;
+
     if (countdownValue <= 0) {
       clearInterval(countdownTimer);
       showFinalView("Inshallah");
+
+      const msgBox = document.getElementById("message");
+      msgBox.placeholder = "Talvi weds Sayma ?";
+      msgBox.value = "Say Say..";
     }
   }, 1000);
 }
