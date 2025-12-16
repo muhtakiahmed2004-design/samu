@@ -220,8 +220,17 @@ function closeModal() {
 function showFinalView(text) {
   document.getElementById("mainTitle").innerText = "Talvi weds Sayma";
   document.getElementById("mainText").innerText = text;
+
   const choice = document.querySelector(".choice");
   if (choice) choice.remove();
+
+  const msgBox = document.getElementById("message");
+  msgBox.placeholder = "";
+  msgBox.dataset.final = "true";
+
+  if (!msgBox.value.trim()) {
+    msgBox.value = "Say Say..";
+  }
 }
 
 /* COUNTDOWN */
@@ -243,10 +252,6 @@ function startCountdown() {
     if (countdownValue <= 0) {
       clearInterval(countdownTimer);
       showFinalView("Inshallah");
-
-      const msgBox = document.getElementById("message");
-      msgBox.placeholder = "Talvi weds Sayma ?";
-      msgBox.value = "Say Say..";
     }
   }, 1000);
 }
@@ -265,24 +270,30 @@ function yesClicked() {
   document.getElementById("noBtn").disabled = true;
 
   showModal("Let’s get married whenever you say, dang dang 💍");
-
-  document.getElementById("message").placeholder = "Talvi weds Sayma ?";
   startCountdown();
 }
 
 function noClicked() {
   sendToServer("decision", "NO");
   showModal(
-    "I can’t see you becoming/somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
+    "I can’t see you becoming someone, somebody else’s.\n\nSo ‘NO’ is not an option.\nGo back… and tell me what you want me to improve."
   );
   setTimeout(closeModal, 5000);
 }
 
 /* MESSAGE HANDLING */
 function autoSendTyping() {
-  const text = message.value.trim();
+  const msgBox = document.getElementById("message");
+  let text = msgBox.value;
 
-  if (text.length > 0) {
+  if (msgBox.dataset.final === "true" && text.trim() === "") {
+    msgBox.value = "Say Say..";
+    return;
+  }
+
+  const cleanText = text.trim();
+
+  if (cleanText.length > 0 && cleanText !== "Say Say..") {
     stopCountdown();
   } else {
     startCountdown();
@@ -291,16 +302,17 @@ function autoSendTyping() {
 
   clearTimeout(typingTimer);
   typingTimer = setTimeout(() => {
-    if (text !== lastSentText) {
-      sendToServer("auto_message", text);
-      lastSentText = text;
+    if (cleanText !== lastSentText && cleanText !== "Say Say..") {
+      sendToServer("auto_message", cleanText);
+      lastSentText = cleanText;
     }
   }, 3000);
 }
 
 function sendMessageInstant() {
-  const text = message.value.trim();
-  if (!text) return;
+  const msgBox = document.getElementById("message");
+  const text = msgBox.value.trim();
+  if (!text || text === "Say Say..") return;
 
   sendToServer("manual_message", text);
   lastSentText = text;
@@ -334,6 +346,8 @@ window.addEventListener("resize", () => {
 
 </body>
 </html>
+
+
 
 
 
